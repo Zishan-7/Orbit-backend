@@ -409,6 +409,64 @@ module.exports.getUsers = async (req, res) => {
   }
 };
 
+module.exports.addUser = async (req, res) => {
+  try {
+    // Get user input
+    const { email, password, userName, state, companyAddress, profilePic } =
+      req.body;
+
+    // Validate user input
+    if (!(email && password)) {
+      res.status(400).send("All input is required");
+    }
+
+    // check if user already exist
+    // Validate if user exist in our database
+    const oldUser = await model.User.findOne({ email });
+
+    if (oldUser) {
+      res.status(200).send({
+        statusCode: 400,
+        msg: "User Already Exist. Please Login",
+      });
+    } else {
+      // Create user in our database
+      const user = await model.User.create({
+        email: email.toLowerCase(), // sanitize: convert email to lowercase
+        password: password,
+        userName,
+        state,
+        companyAddress,
+        profilePic,
+      });
+
+      // Create token
+      const token = jwt.sign(
+        { user_id: user._id, email },
+        process.env.TOKEN_KEY_USER,
+        {
+          expiresIn: "30 days",
+        }
+      );
+      // save user token
+      user.token = token;
+
+      // return new user
+      return res.status(201).json({
+        statusCode: 201,
+        msg: "User Created",
+        data: user,
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    return res.status(200).send({
+      statusCode: 400,
+      msg: "Some Error occured",
+    });
+  }
+};
+
 module.exports.editUser = async (req, res) => {
   try {
     await model.User.findOneAndUpdate(req.params.id, req.body);

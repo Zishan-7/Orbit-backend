@@ -33,6 +33,7 @@ router.delete("/promoCode", auth, controller.Admin.deletePromoCode);
 // Users
 
 router.get("/user", auth, controller.Admin.getUsers);
+router.post("/user", auth, controller.Admin.addUser);
 router.put("/user/:id", auth, controller.Admin.editUser);
 router.delete("/user", auth, controller.Admin.deleteUser);
 
