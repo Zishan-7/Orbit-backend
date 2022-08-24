@@ -234,6 +234,7 @@ module.exports.getVendors = async (req, res) => {
 
 module.exports.editVendor = async (req, res) => {
   try {
+    console.log(req.body);
     await model.Vendor.findOneAndUpdate(req.params.id, req.body);
     return res.status(201).json({
       statusCode: 200,
@@ -249,6 +250,7 @@ module.exports.editVendor = async (req, res) => {
 
 module.exports.deleteVendor = async (req, res) => {
   try {
+    console.log(req.body.id);
     await model.Vendor.findByIdAndDelete(req.body.id);
     return res.status(201).json({
       statusCode: 200,
@@ -294,8 +296,24 @@ module.exports.getPromoCodes = async (req, res) => {
   }
 };
 
+module.exports.getSinglePromoCode = async (req, res) => {
+  try {
+    const vendors = await model.PromoCode.findById(req.params.id);
+    return res.status(201).json({
+      statusCode: 200,
+      msg: "Promo Code fetched",
+      data: vendors,
+    });
+  } catch (e) {
+    return res.status(200).send({
+      statusCode: 400,
+      msg: "Some Error occured",
+    });
+  }
+};
 module.exports.editPromoCode = async (req, res) => {
   try {
+    console.log(req.body);
     await model.PromoCode.findOneAndUpdate(req.params.id, req.body);
     return res.status(201).json({
       statusCode: 200,
@@ -395,13 +413,34 @@ module.exports.deleteService = async (req, res) => {
 
 module.exports.getUsers = async (req, res) => {
   try {
-    const vendors = await model.User.find();
+    let query = {};
+    if (req.body.search) {
+      const _$search = { $regex: req.body.search, $options: "i" };
+      query.$or = [
+        {
+          userName: _$search,
+        },
+      ];
+    }
+    if (req.body.state[0]) {
+      query.state = { $in: req.body.state };
+    }
+
+    console.log(query);
+
+    let pipeline = [
+      {
+        $match: query,
+      },
+    ];
+    const vendors = await model.User.aggregate(pipeline);
     return res.status(201).json({
       statusCode: 200,
       msg: "Users fetched",
       data: vendors,
     });
   } catch (e) {
+    console.log(e);
     return res.status(200).send({
       statusCode: 400,
       msg: "Some Error occured",
@@ -488,6 +527,212 @@ module.exports.deleteUser = async (req, res) => {
     return res.status(201).json({
       statusCode: 200,
       msg: "User Deleted",
+    });
+  } catch (e) {
+    return res.status(200).send({
+      statusCode: 400,
+      msg: "Some Error occured",
+    });
+  }
+};
+
+module.exports.addMasterListing = async (req, res) => {
+  try {
+    const listing = await model.Listing.create(req.body);
+    return res.status(201).json({
+      statusCode: 201,
+      msg: "Lising Created",
+      data: listing,
+    });
+  } catch (e) {
+    return res.status(200).send({
+      statusCode: 400,
+      msg: "Some Error occured",
+    });
+  }
+};
+
+module.exports.getMasterListing = async (req, res) => {
+  try {
+    let query = {};
+    if (req.body.search) {
+      const _$search = { $regex: req.body.search, $options: "i" };
+      query.$or = [
+        {
+          logisticCompany: _$search,
+        },
+      ];
+    }
+    if (req.body.status[0]) {
+      query.status = { $in: req.body.status };
+    }
+    if (req.body.startDate && req.body.endDate) {
+      query.startDate = {
+        $gt: new Date(req.body.startDate),
+      };
+      query.endDate = {
+        $lt: new Date(req.body.endDate),
+      };
+    }
+
+    console.log(query);
+
+    let pipeline = [
+      {
+        $match: query,
+      },
+    ];
+
+    const listing = await model.Listing.aggregate(pipeline);
+    return res.status(201).json({
+      statusCode: 200,
+      msg: "Master Listings fetched",
+      data: listing,
+    });
+  } catch (e) {
+    console.log(e);
+    return res.status(200).send({
+      statusCode: 400,
+      msg: "Some Error occured",
+    });
+  }
+};
+
+module.exports.editMasterListing = async (req, res) => {
+  try {
+    await model.Listing.findOneAndUpdate(req.params.id, req.body);
+    return res.status(201).json({
+      statusCode: 200,
+      msg: "Listing updated",
+    });
+  } catch (e) {
+    return res.status(200).send({
+      statusCode: 400,
+      msg: "Some Error occured",
+    });
+  }
+};
+
+module.exports.deleteMasterListing = async (req, res) => {
+  try {
+    await model.Listing.findByIdAndDelete(req.body.id);
+    return res.status(201).json({
+      statusCode: 200,
+      msg: "Listing Deleted",
+    });
+  } catch (e) {
+    return res.status(200).send({
+      statusCode: 400,
+      msg: "Some Error occured",
+    });
+  }
+};
+
+module.exports.placeOrder = async (req, res) => {
+  try {
+    const fee = await model.AdminFee.findOne();
+    const body = req.body;
+    body.adminFee = (fee.fee / 100) * body.totalPrice;
+    body.vendorPrice = body.totalPrice - body.adminFee;
+    const listing = await model.Order.create(req.body);
+    return res.status(201).json({
+      statusCode: 201,
+      msg: "Order Placed",
+      data: listing,
+    });
+  } catch (e) {
+    console.log(e);
+    return res.status(200).send({
+      statusCode: 400,
+      msg: "Some Error occured",
+    });
+  }
+};
+
+module.exports.getOrders = async (req, res) => {
+  try {
+    const listing = await model.Order.find();
+    return res.status(201).json({
+      statusCode: 200,
+      msg: "Orders fetched",
+      data: listing,
+    });
+  } catch (e) {
+    return res.status(200).send({
+      statusCode: 400,
+      msg: "Some Error occured",
+    });
+  }
+};
+
+module.exports.editOrder = async (req, res) => {
+  try {
+    await model.Order.findOneAndUpdate(req.params.id, req.body);
+    return res.status(201).json({
+      statusCode: 200,
+      msg: "Order updated",
+    });
+  } catch (e) {
+    return res.status(200).send({
+      statusCode: 400,
+      msg: "Some Error occured",
+    });
+  }
+};
+
+module.exports.deleteOrder = async (req, res) => {
+  try {
+    await model.Order.findByIdAndDelete(req.body.id);
+    return res.status(201).json({
+      statusCode: 200,
+      msg: "Order Deleted",
+    });
+  } catch (e) {
+    return res.status(200).send({
+      statusCode: 400,
+      msg: "Some Error occured",
+    });
+  }
+};
+
+module.exports.getAdminFee = async (req, res) => {
+  try {
+    const listing = await model.AdminFee.findOne();
+    return res.status(201).json({
+      statusCode: 200,
+      msg: "Admin Fee fetched",
+      data: listing,
+    });
+  } catch (e) {
+    return res.status(200).send({
+      statusCode: 400,
+      msg: "Some Error occured",
+    });
+  }
+};
+
+module.exports.editAdminFee = async (req, res) => {
+  try {
+    await model.AdminFee.findOneAndUpdate(req.params.id, req.body);
+    return res.status(201).json({
+      statusCode: 200,
+      msg: "Admin Fee updated",
+    });
+  } catch (e) {
+    return res.status(200).send({
+      statusCode: 400,
+      msg: "Some Error occured",
+    });
+  }
+};
+
+module.exports.addAdminFee = async (req, res) => {
+  try {
+    const listing = await model.AdminFee.create(req.body);
+    return res.status(201).json({
+      statusCode: 201,
+      msg: "Admin Fee Created",
+      data: listing,
     });
   } catch (e) {
     return res.status(200).send({

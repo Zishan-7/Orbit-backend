@@ -27,6 +27,7 @@ router.delete("/services", auth, controller.Admin.deleteService);
 
 router.get("/promoCode", auth, controller.Admin.getPromoCodes);
 router.post("/promoCode", auth, controller.Admin.addPromoCode);
+router.get("/promoCode/:id", auth, controller.Admin.getSinglePromoCode);
 router.put("/promoCode/:id", auth, controller.Admin.editPromoCode);
 router.delete("/promoCode", auth, controller.Admin.deletePromoCode);
 
@@ -36,5 +37,25 @@ router.get("/user", auth, controller.Admin.getUsers);
 router.post("/user", auth, controller.Admin.addUser);
 router.put("/user/:id", auth, controller.Admin.editUser);
 router.delete("/user", auth, controller.Admin.deleteUser);
+
+// MasterListing
+
+router.post("/masterListing", auth, controller.Admin.getMasterListing);
+router.post("/masterListing", auth, controller.Admin.addMasterListing);
+router.put("/masterListing/:id", auth, controller.Admin.editMasterListing);
+router.delete("/masterListing", auth, controller.Admin.deleteMasterListing);
+
+// Orders
+
+router.get("/order", auth, controller.Admin.getOrders);
+router.post("/order", auth, controller.Admin.placeOrder);
+router.put("/order/:id", auth, controller.Admin.editOrder);
+router.delete("/order", auth, controller.Admin.deleteOrder);
+
+//Admin Fee
+
+router.get("/adminFee", auth, controller.Admin.getAdminFee);
+router.post("/adminFee", auth, controller.Admin.addAdminFee);
+router.put("/adminFee/:id", auth, controller.Admin.editAdminFee);
 
 module.exports = router;

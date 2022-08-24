@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const adminFeeSchema = new Schema(
   {
-    fee: { type: String, required: true },
+    fee: { type: Number, required: true },
   },
   { timestamps: true }
 );

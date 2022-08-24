@@ -4,4 +4,7 @@ module.exports = {
   Vendor: require("./Vendor"),
   PromoCode: require("./PromoCode"),
   Service: require("./Service"),
+  Listing: require("./Listing"),
+  Order: require("./Order"),
+  AdminFee: require("./AdminFee"),
 };
