@@ -51,6 +51,11 @@ router.get("/order", auth, controller.Admin.getOrders);
 router.post("/order", auth, controller.Admin.placeOrder);
 router.put("/order/:id", auth, controller.Admin.editOrder);
 router.delete("/order", auth, controller.Admin.deleteOrder);
+router.post("/newOrder", auth, controller.Admin.getNewOrders);
+router.post("/userOrder", auth, controller.Admin.getUsersOrders);
+router.post("/clientSales", auth, controller.Admin.getClientSales);
+router.post("/vendorSales", auth, controller.Admin.getVendorSales);
+router.put("/changeOrderStatus/:id", auth, controller.Admin.changeOrderStatus);
 
 //Admin Fee
 

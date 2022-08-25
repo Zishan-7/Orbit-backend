@@ -18,6 +18,7 @@ const orderSchema = new Schema(
     promoCodeValue: { type: String, required: true, default: "" },
     date: { type: Date, required: true },
     status: { type: String, required: true, default: "REQUESTED" },
+    paymentStatus: { type: String, required: true, default: "PENDING" },
     totalPrice: { type: Number, required: true, default: 0 },
     vendorPrice: { type: Number, required: true, default: 0 },
     adminFee: { type: Number, required: true, default: 0 },
