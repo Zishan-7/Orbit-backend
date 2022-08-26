@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const controller = require("../Controller");
-const auth = require("../Middleware/adminAuth");
+const auth = require("../Middleware/userAuth");
 
 router.post("/login", controller.Admin.login);
 router.post("/register", controller.Admin.register);
@@ -62,5 +62,13 @@ router.put("/changeOrderStatus/:id", auth, controller.Admin.changeOrderStatus);
 router.get("/adminFee", auth, controller.Admin.getAdminFee);
 router.post("/adminFee", auth, controller.Admin.addAdminFee);
 router.put("/adminFee/:id", auth, controller.Admin.editAdminFee);
+
+// chat
+
+router.post("/chat", auth, controller.Admin.accessChat);
+router.get("/chat", auth, controller.Admin.fetchChats);
+
+router.get("/chat/:chatId", auth, controller.Admin.getAllMessages);
+router.post("/chat/sendMessage", auth, controller.Admin.sendMessage);
 
 module.exports = router;

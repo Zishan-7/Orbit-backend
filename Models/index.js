@@ -7,4 +7,6 @@ module.exports = {
   Listing: require("./Listing"),
   Order: require("./Order"),
   AdminFee: require("./AdminFee"),
+  Chat: require("./Chat"),
+  Message: require("./Message"),
 };

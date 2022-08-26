@@ -13,7 +13,7 @@ module.exports.register = async (req, res) => {
 
     // check if user already exist
     // Validate if user exist in our database
-    const oldUser = await model.Admin.findOne({ email });
+    const oldUser = await model.User.findOne({ email, isAdmin: true });
 
     if (oldUser) {
       res.status(200).send({
@@ -22,15 +22,20 @@ module.exports.register = async (req, res) => {
       });
     } else {
       // Create user in our database
-      const admin = await model.Admin.create({
+      const admin = await model.User.create({
         email: email.toLowerCase(), // sanitize: convert email to lowercase
         password: password,
+        userName: "Admin",
+        state: " ",
+        companyAddress: " ",
+        profilePic: " ",
+        isAdmin: true,
       });
 
       // Create token
       const token = jwt.sign(
-        { admin_id: admin._id, email },
-        process.env.TOKEN_KEY_ADMIN,
+        { user_id: admin._id, email },
+        process.env.TOKEN_KEY_USER,
         {
           expiresIn: "30 days",
         }
@@ -46,6 +51,7 @@ module.exports.register = async (req, res) => {
       });
     }
   } catch (err) {
+    console.log(err);
     return res.status(200).send({
       statusCode: 400,
       msg: "Some Error occured",
@@ -65,12 +71,12 @@ module.exports.login = async (req, res) => {
         .send({ statusCode: 200, message: "All input is required" });
     }
     // Validate if user exist in our database
-    const admin = await model.Admin.findOne({ email });
+    const admin = await model.User.findOne({ email, isAdmin: true });
     if (admin && admin.password == password) {
       // Create token
       const token = jwt.sign(
-        { id: admin._id, email },
-        process.env.TOKEN_KEY_ADMIN,
+        { user_id: admin._id, email },
+        process.env.TOKEN_KEY_USER,
         {
           expiresIn: "30 days",
         }
@@ -103,8 +109,9 @@ module.exports.login = async (req, res) => {
 
 module.exports.getProfile = async (req, res) => {
   try {
-    const id = req.admin.id;
-    const user = await model.Admin.findById(id);
+    const id = req.user.user_id;
+    console.log(id);
+    const user = await model.User.findById(id);
 
     if (!user) {
       return res.status(200).send({
@@ -414,7 +421,9 @@ module.exports.deleteService = async (req, res) => {
 
 module.exports.getUsers = async (req, res) => {
   try {
-    let query = {};
+    let query = {
+      isAdmin: false,
+    };
     if (req.body.search) {
       const _$search = { $regex: req.body.search, $options: "i" };
       query.$or = [
@@ -909,5 +918,119 @@ module.exports.getVendorSales = async (req, res) => {
       statusCode: 400,
       msg: "Some Error occured",
     });
+  }
+};
+
+//chat
+
+module.exports.accessChat = async (req, res) => {
+  const { userId } = req.body;
+
+  if (!userId) {
+    console.log("UserId param not sent with request");
+    return res.sendStatus(400);
+  }
+
+  var isChat = await model.Chat.find({
+    isGroupChat: false,
+    $and: [
+      { users: { $elemMatch: { $eq: req.user.user_id } } },
+      { users: { $elemMatch: { $eq: userId } } },
+    ],
+  })
+    .populate("users", "-password")
+    .populate("latestMessage");
+
+  isChat = await model.User.populate(isChat, {
+    path: "latestMessage.sender",
+    select: "userName profilePic email",
+  });
+
+  if (isChat.length > 0) {
+    res.send(isChat[0]);
+  } else {
+    var chatData = {
+      chatName: "sender",
+      isGroupChat: false,
+      users: [req.user.user_id, userId],
+    };
+
+    try {
+      const createdChat = await model.Chat.create(chatData);
+      const FullChat = await model.Chat.findOne({
+        _id: createdChat._id,
+      }).populate("users", "-password");
+      res.status(200).json(FullChat);
+    } catch (error) {
+      res.status(400);
+      throw new Error(error.message);
+    }
+  }
+};
+
+module.exports.fetchChats = async (req, res) => {
+  try {
+    model.Chat.find({ users: { $elemMatch: { $eq: req.user.user_id } } })
+      .populate("users", "-password")
+      .populate("latestMessage")
+      .sort({ updatedAt: -1 })
+      .then(async (results) => {
+        results = await model.User.populate(results, {
+          path: "latestMessage.sender",
+          select: "userName profilePic email",
+        });
+        res.status(200).send(results);
+      });
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
+};
+
+module.exports.getAllMessages = async (req, res) => {
+  try {
+    const messages = await model.Message.find({
+      chat: req.params.chatId,
+    }).populate("sender", "userName profilePic email");
+    // .populate("chat");
+    res.json(messages);
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
+};
+
+module.exports.sendMessage = async (req, res) => {
+  const { content, chatId } = req.body;
+
+  if (!content || !chatId) {
+    console.log("Invalid data passed into request");
+    return res.sendStatus(400);
+  }
+
+  var newMessage = {
+    sender: req.user.user_id,
+    content: content,
+    chat: chatId,
+  };
+
+  try {
+    var message = await model.Message.create(newMessage);
+
+    message = await message.populate("sender", "name pic");
+    message = await message.populate("chat");
+    message = await model.User.populate(message, {
+      path: "chat.users",
+      select: "userName profilePic email",
+    });
+
+    await model.Chat.findByIdAndUpdate(req.body.chatId, {
+      latestMessage: message,
+    });
+
+    res.json(message);
+  } catch (error) {
+    console.log(error);
+    res.status(400);
   }
 };
