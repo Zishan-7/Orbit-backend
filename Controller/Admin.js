@@ -576,10 +576,13 @@ module.exports.getMasterListing = async (req, res) => {
     if (req.body.status[0]) {
       query.status = { $in: req.body.status };
     }
-    if (req.body.startDate && req.body.endDate) {
+    if (req.body.startDate) {
       query.startDate = {
         $gt: new Date(req.body.startDate),
       };
+    }
+
+    if (req.body.endDate) {
       query.endDate = {
         $lt: new Date(req.body.endDate),
       };
@@ -850,6 +853,7 @@ module.exports.getClientSales = async (req, res) => {
       status: { $in: ["ACCEPTED"] },
     };
     if (req.body.search) {
+      console.log(req.body.search);
       const _$search = { $regex: req.body.search, $options: "i" };
       query.$or = [
         {
@@ -857,7 +861,7 @@ module.exports.getClientSales = async (req, res) => {
         },
       ];
     }
-    if (req.body.paymentStatus[0]) {
+    if (req.body.paymentStatus && req.body.paymentStatus[0]) {
       query.paymentStatus = { $in: req.body.paymentStatus };
     }
     console.log(query);
@@ -896,7 +900,7 @@ module.exports.getVendorSales = async (req, res) => {
       ];
     }
 
-    if (req.body.paymentStatus[0]) {
+    if (req.body.paymentStatus && req.body.paymentStatus[0]) {
       query.paymentStatus = { $in: req.body.paymentStatus };
     }
     console.log(query);

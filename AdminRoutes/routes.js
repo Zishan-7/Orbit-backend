@@ -67,7 +67,6 @@ router.put("/adminFee/:id", auth, controller.Admin.editAdminFee);
 
 router.post("/chat", auth, controller.Admin.accessChat);
 router.get("/chat", auth, controller.Admin.fetchChats);
-
 router.get("/chat/:chatId", auth, controller.Admin.getAllMessages);
 router.post("/chat/sendMessage", auth, controller.Admin.sendMessage);
 
