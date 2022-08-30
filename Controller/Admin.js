@@ -761,10 +761,14 @@ module.exports.deleteOrder = async (req, res) => {
 
 module.exports.changeOrderStatus = async (req, res) => {
   try {
-    await model.Order.findOneAndUpdate(req.params.id, req.body);
+    console.log(req.body);
+    const order = await model.Order.findById(req.params.id);
+    order.status = req.body.status;
+    await order.save();
     return res.status(201).json({
       statusCode: 200,
       msg: "Order Status updated",
+      data: order,
     });
   } catch (e) {
     return res.status(200).send({
