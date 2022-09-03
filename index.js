@@ -32,8 +32,9 @@ io.on("connection", (socket) => {
   console.log(`connected to socket!!`);
 
   socket.on("setup", (userData) => {
+    console.log(userData);
     socket.join(userData._id);
-    socket.emit(`connected ${userData._id}`);
+    socket.emit("connected");
   });
 
   socket.on("join chat", (room) => {
