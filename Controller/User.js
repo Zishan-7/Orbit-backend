@@ -365,6 +365,7 @@ module.exports.getLogisticCompanies = async (req, res) => {
 
 module.exports.fetchFilteredCompanies = async (req, res) => {
   try {
+    console.log(req.body);
     let { from, dropOff, weight } = req.body;
     let query = {};
 
@@ -379,7 +380,7 @@ module.exports.fetchFilteredCompanies = async (req, res) => {
     // dropoff is array
 
     query.maxWeight = {
-      $gt: weight,
+      $gt: parseInt(weight),
     };
 
     // query.$match = { size: "medium" };
@@ -392,6 +393,7 @@ module.exports.fetchFilteredCompanies = async (req, res) => {
     ];
 
     const listing = await model.Listing.aggregate(pipeline);
+    console.log(listing);
     return res.status(201).json({
       statusCode: 200,
       msg: "Logistic Companies fetched",
