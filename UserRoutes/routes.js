@@ -8,7 +8,11 @@ router.post("/logout", auth, controller.User.logout);
 router.get("/getProfile", auth, controller.User.getProfile);
 router.put("/editProfile", auth, controller.User.editProfile);
 router.post("/changePass", auth, controller.User.changePassword);
+
+//companies
+
 router.post("/logisticCompanies", auth, controller.User.getLogisticCompanies);
+router.post("/filteredCompanies", auth, controller.User.fetchFilteredCompanies);
 
 // chat
 
