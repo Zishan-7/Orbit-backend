@@ -393,7 +393,7 @@ module.exports.fetchFilteredCompanies = async (req, res) => {
     ];
 
     const listing = await model.Listing.aggregate(pipeline);
-    console.log(listing);
+    // console.log(listing);
     return res.status(201).json({
       statusCode: 200,
       msg: "Logistic Companies fetched",
