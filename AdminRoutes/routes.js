@@ -44,6 +44,7 @@ router.post("/masterListing", auth, controller.Admin.getMasterListing);
 router.post("/masterListing", auth, controller.Admin.addMasterListing);
 router.put("/masterListing/:id", auth, controller.Admin.editMasterListing);
 router.delete("/masterListing", auth, controller.Admin.deleteMasterListing);
+router.post("/filteredCompanies", auth, controller.User.fetchFilteredCompanies);
 
 // Orders
 

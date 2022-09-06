@@ -1042,3 +1042,46 @@ module.exports.sendMessage = async (req, res) => {
     res.status(400);
   }
 };
+
+module.exports.fetchFilteredCompanies = async (req, res) => {
+  try {
+    let { from, dropOff, weight } = req.body;
+    let query = {};
+
+    const _$search = { $regex: from, $options: "i" };
+    query.$or = [
+      {
+        pickUpPoint: _$search,
+      },
+    ];
+
+    query.dropOffState = { $in: dropOff };
+    // dropoff is array
+
+    query.maxWeight = {
+      $gt: weight,
+    };
+
+    // query.$match = { size: "medium" };
+    console.log(query);
+
+    let pipeline = [
+      {
+        $match: query,
+      },
+    ];
+
+    const listing = await model.Listing.aggregate(pipeline);
+    return res.status(201).json({
+      statusCode: 200,
+      msg: "Logistic Companies fetched",
+      data: listing,
+    });
+  } catch (e) {
+    console.log(e);
+    return res.status(200).send({
+      statusCode: 400,
+      msg: "Some Error occured",
+    });
+  }
+};
