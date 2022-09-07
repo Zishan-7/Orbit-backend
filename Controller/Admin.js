@@ -697,6 +697,17 @@ module.exports.placeOrder = async (req, res) => {
     body.adminFee = (fee.fee / 100) * body.totalPrice;
     body.vendorPrice = body.totalPrice - body.adminFee;
     const listing = await model.Order.create(req.body);
+
+    const admin = await model.User.findOne({ isAdmin: true });
+
+    var chatData = {
+      chatName: listing._id,
+      isGroupChat: false,
+      users: [listing.userId, admin._id],
+    };
+
+    const createdChat = await model.Chat.create(chatData);
+
     return res.status(201).json({
       statusCode: 201,
       msg: "Order Placed",
@@ -1079,6 +1090,101 @@ module.exports.fetchFilteredCompanies = async (req, res) => {
     });
   } catch (e) {
     console.log(e);
+    return res.status(200).send({
+      statusCode: 400,
+      msg: "Some Error occured",
+    });
+  }
+};
+
+module.exports.dashboard = async (req, res) => {
+  try {
+    const totalBookings = await model.Order.countDocuments();
+    const pendingApprovals = await model.Order.countDocuments({
+      status: "REQUESTED",
+    });
+    const totalAccepted = await model.Order.countDocuments({
+      status: "ACCEPTED",
+    });
+    const totalRejected = await model.Order.countDocuments({
+      status: "REJECTED",
+    });
+
+    const totalOnGoing = await model.Order.countDocuments({
+      status: "ACTIVE",
+    });
+
+    const totalPendingVendorOrderPayment = await model.Order.countDocuments({
+      paymentStatus: "PENDING",
+    });
+
+    const totalVendors = await model.Vendor.countDocuments();
+
+    return res.status(201).json({
+      statusCode: 200,
+      msg: "Data fetched",
+      data: {
+        totalBookings,
+        pendingApprovals,
+        totalAccepted,
+        totalRejected,
+        totalVendors,
+        totalPendingVendorOrderPayment,
+        totalOnGoing,
+      },
+    });
+  } catch (e) {
+    return res.status(200).send({
+      statusCode: 400,
+      msg: "Some Error occured",
+    });
+  }
+};
+
+module.exports.admins = async (req, res) => {
+  try {
+    const totalVendors = await model.User.findOne({ isAdmin: true });
+
+    return res.status(201).json({
+      statusCode: 200,
+      msg: "Data fetched",
+      data: {
+        totalVendors,
+      },
+    });
+  } catch (e) {
+    return res.status(200).send({
+      statusCode: 400,
+      msg: "Some Error occured",
+    });
+  }
+};
+
+module.exports.sendNotification = async (req, res) => {
+  try {
+    const vendor = await model.Notification.create(req.body);
+    return res.status(201).json({
+      statusCode: 201,
+      msg: "Notifcation sent",
+      data: vendor,
+    });
+  } catch (e) {
+    return res.status(200).send({
+      statusCode: 400,
+      msg: "Some Error occured",
+    });
+  }
+};
+
+module.exports.getNotifications = async (req, res) => {
+  try {
+    const vendors = await model.Notification.find();
+    return res.status(201).json({
+      statusCode: 200,
+      msg: "Notifications fetched",
+      data: vendors,
+    });
+  } catch (e) {
     return res.status(200).send({
       statusCode: 400,
       msg: "Some Error occured",

@@ -9,4 +9,5 @@ module.exports = {
   AdminFee: require("./AdminFee"),
   Chat: require("./Chat"),
   Message: require("./Message"),
+  Notification: require("./Notification"),
 };

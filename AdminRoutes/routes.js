@@ -70,5 +70,12 @@ router.post("/chat", auth, controller.Admin.accessChat);
 router.get("/chat", auth, controller.Admin.fetchChats);
 router.get("/chat/:chatId", auth, controller.Admin.getAllMessages);
 router.post("/chat/sendMessage", auth, controller.Admin.sendMessage);
+router.get("/dashboard", auth, controller.Admin.dashboard);
+router.get("/admins", auth, controller.Admin.admins);
+
+// notifications
+
+router.post("/notification", auth, controller.Admin.sendNotification);
+router.get("/notification", auth, controller.Admin.getNotifications);
 
 module.exports = router;

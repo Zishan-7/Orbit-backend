@@ -366,7 +366,7 @@ module.exports.getLogisticCompanies = async (req, res) => {
 module.exports.fetchFilteredCompanies = async (req, res) => {
   try {
     console.log(req.body);
-    let { from, dropOff, weight } = req.body;
+    let { from, dropOff, weight, services } = req.body;
     let query = {};
 
     const _$search = { $regex: from, $options: "i" };
@@ -377,7 +377,12 @@ module.exports.fetchFilteredCompanies = async (req, res) => {
     ];
 
     query.dropOffState = { $in: dropOff };
+
     // dropoff is array
+
+    query.serviceProvided = { $in: services };
+
+    //services is array
 
     query.maxWeight = {
       $gt: parseInt(weight),
