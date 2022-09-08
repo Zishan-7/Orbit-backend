@@ -76,6 +76,6 @@ router.get("/admins", auth, controller.Admin.admins);
 // notifications
 
 router.post("/notification", auth, controller.Admin.sendNotification);
-router.get("/notification", auth, controller.Admin.getNotifications);
+router.post("/getNotification", auth, controller.Admin.getNotifications);
 
 module.exports = router;
