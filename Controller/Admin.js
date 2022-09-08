@@ -1,5 +1,6 @@
 const model = require("../Models");
 const jwt = require("jsonwebtoken");
+const moment = require("moment");
 
 module.exports.register = async (req, res) => {
   try {
@@ -1178,15 +1179,23 @@ module.exports.sendNotification = async (req, res) => {
 
 module.exports.getNotifications = async (req, res) => {
   try {
-    const vendors = await model.Notification.find({
-      createdAt: req.body.date,
-    });
+    const date1 = moment(req.body.date);
+    const Startday = new Date(date1.startOf("day"));
+    const Endday = new Date(date1.endOf("day"));
+    let query = {
+      createdAt: {
+        $gt: Startday,
+        $lt: Endday,
+      },
+    };
+    const vendors = await model.Notification.find(query);
     return res.status(201).json({
       statusCode: 200,
       msg: "Notifications fetched",
       data: vendors,
     });
   } catch (e) {
+    console.log(e);
     return res.status(200).send({
       statusCode: 400,
       msg: "Some Error occured",
