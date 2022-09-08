@@ -1178,7 +1178,9 @@ module.exports.sendNotification = async (req, res) => {
 
 module.exports.getNotifications = async (req, res) => {
   try {
-    const vendors = await model.Notification.find();
+    const vendors = await model.Notification.find({
+      createdAt: req.body.date,
+    });
     return res.status(201).json({
       statusCode: 200,
       msg: "Notifications fetched",
