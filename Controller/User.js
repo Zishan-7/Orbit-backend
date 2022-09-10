@@ -326,7 +326,7 @@ module.exports.getLogisticCompanies = async (req, res) => {
     let sort = 1;
 
     if (req.body.sort) {
-      sort = sort;
+      sort = req.body.sort;
     }
     if (req.body.search) {
       const _$search = { $regex: req.body.search, $options: "i" };
@@ -374,6 +374,11 @@ module.exports.getLogisticCompanies = async (req, res) => {
 module.exports.fetchFilteredCompanies = async (req, res) => {
   try {
     console.log(req.body);
+    let sort = 1;
+
+    if (req.body.sort) {
+      sort = req.body.sort;
+    }
     let { from, dropOff, weight, services } = req.body;
     let query = {};
 
@@ -405,7 +410,9 @@ module.exports.fetchFilteredCompanies = async (req, res) => {
       },
     ];
 
-    const listing = await model.Listing.aggregate(pipeline);
+    const listing = await model.Listing.aggregate(pipeline).sort({
+      price: sort,
+    });
     // console.log(listing);
     return res.status(201).json({
       statusCode: 200,
@@ -518,6 +525,33 @@ module.exports.getSinglePromoCode = async (req, res) => {
       data: vendors,
     });
   } catch (e) {
+    return res.status(200).send({
+      statusCode: 400,
+      msg: "Some Error occured",
+    });
+  }
+};
+
+module.exports.calculatePrices = async (req, res) => {
+  try {
+    const response = {
+      adminFee: 0,
+      vendorFee: 0,
+      totalPrice: 0,
+    };
+    const fee = await model.AdminFee.findOne();
+    const price = req.body.price;
+    response.adminFee = (fee.fee / 100) * price;
+    response.vendorFee = price;
+    response.totalPrice = price + response.adminFee;
+
+    return res.status(200).json({
+      statusCode: 200,
+      msg: "Calculation Successful",
+      data: response,
+    });
+  } catch (e) {
+    console.log(e);
     return res.status(200).send({
       statusCode: 400,
       msg: "Some Error occured",

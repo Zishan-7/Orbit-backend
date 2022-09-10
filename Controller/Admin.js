@@ -556,6 +556,7 @@ module.exports.addMasterListing = async (req, res) => {
       data: listing,
     });
   } catch (e) {
+    console.log(e);
     return res.status(200).send({
       statusCode: 400,
       msg: "Some Error occured",
@@ -696,7 +697,8 @@ module.exports.placeOrder = async (req, res) => {
     const fee = await model.AdminFee.findOne();
     const body = req.body;
     body.adminFee = (fee.fee / 100) * body.totalPrice;
-    body.vendorPrice = body.totalPrice - body.adminFee;
+    body.vendorPrice = body.totalPrice;
+    body.totalPrice = body.totalPrice + body.adminFee;
     const listing = await model.Order.create(req.body);
 
     const admin = await model.User.findOne({ isAdmin: true });

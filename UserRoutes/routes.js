@@ -33,4 +33,8 @@ router.get("/cancelled", auth, controller.User.getCancelledBookings);
 router.get("/promoCode", auth, controller.User.getPromoCodes);
 router.get("/promoCode/:id", auth, controller.User.getSinglePromoCode);
 
+// calculate price
+
+router.post("/calculatePrice", auth, controller.User.calculatePrices);
+
 module.exports = router;
