@@ -323,6 +323,11 @@ module.exports.sendMessage = async (req, res) => {
 module.exports.getLogisticCompanies = async (req, res) => {
   try {
     let query = {};
+    let sort = 1;
+
+    if (req.body.sort) {
+      sort = sort;
+    }
     if (req.body.search) {
       const _$search = { $regex: req.body.search, $options: "i" };
       query.$or = [
@@ -348,12 +353,15 @@ module.exports.getLogisticCompanies = async (req, res) => {
       },
     ];
 
-    const listing = await model.Listing.aggregate(pipeline);
+    const listing = await model.Listing.aggregate(pipeline).sort({
+      price: sort,
+    });
     return res.status(201).json({
       statusCode: 200,
-      msg: "Logictic Companies fetched",
+      msg: "Logistic Companies fetched",
       data: listing,
     });
+    //
   } catch (e) {
     console.log(e);
     return res.status(200).send({
