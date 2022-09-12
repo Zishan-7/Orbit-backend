@@ -252,7 +252,7 @@ module.exports.getVendors = async (req, res) => {
 module.exports.editVendor = async (req, res) => {
   try {
     console.log(req.body);
-    await model.Vendor.findOneAndUpdate(req.params.id, req.body);
+    await model.Vendor.findByIdAndUpdate(req.params.id, req.body);
     return res.status(201).json({
       statusCode: 200,
       msg: "Vendor updated",
@@ -332,7 +332,7 @@ module.exports.getSinglePromoCode = async (req, res) => {
 module.exports.editPromoCode = async (req, res) => {
   try {
     console.log(req.body);
-    await model.PromoCode.findOneAndUpdate(req.params.id, req.body);
+    await model.PromoCode.findByIdAndUpdate(req.params.id, req.body);
     return res.status(201).json({
       statusCode: 200,
       msg: "Promo Code updated",
@@ -528,12 +528,13 @@ module.exports.addUser = async (req, res) => {
 
 module.exports.editUser = async (req, res) => {
   try {
-    await model.User.findOneAndUpdate(req.params.id, req.body);
+    await model.User.findByIdAndUpdate(req.params.id, req.body);
     return res.status(201).json({
       statusCode: 200,
       msg: "User updated",
     });
   } catch (e) {
+    console.log(e);
     return res.status(200).send({
       statusCode: 400,
       msg: "Some Error occured",
@@ -624,7 +625,8 @@ module.exports.getMasterListing = async (req, res) => {
 
 module.exports.editMasterListing = async (req, res) => {
   try {
-    await model.Listing.findOneAndUpdate(req.params.id, req.body);
+    console.log(req.params.id);
+    await model.Listing.findByIdAndUpdate(req.params.id, req.body);
     return res.status(201).json({
       statusCode: 200,
       msg: "Listing updated",
@@ -726,7 +728,7 @@ module.exports.placeOrder = async (req, res) => {
 
     if (req.body.listingId) {
       console.log("hello" + req.body.listingId);
-      await model.Listing.findOneAndUpdate(req.body.listingId, {
+      await model.Listing.findByIdAndUpdate(req.body.listingId, {
         status: "PROCESSING",
       });
     }
@@ -763,7 +765,7 @@ module.exports.getOrders = async (req, res) => {
 
 module.exports.editOrder = async (req, res) => {
   try {
-    await model.Order.findOneAndUpdate(req.params.id, req.body);
+    await model.Order.findByIdAndUpdate(req.params.id, req.body);
     return res.status(201).json({
       statusCode: 200,
       msg: "Order updated",
