@@ -326,7 +326,7 @@ module.exports.getLogisticCompanies = async (req, res) => {
     let sort = 1;
 
     if (req.body.sort) {
-      sort = req.body.sort;
+      sort = parseInt(req.body.sort);
     }
     if (req.body.search) {
       const _$search = { $regex: req.body.search, $options: "i" };
@@ -345,6 +345,7 @@ module.exports.getLogisticCompanies = async (req, res) => {
       };
     }
 
+    query.status = "ACTIVE";
     console.log(query);
 
     let pipeline = [
@@ -377,7 +378,8 @@ module.exports.fetchFilteredCompanies = async (req, res) => {
     let sort = 1;
 
     if (req.body.sort) {
-      sort = req.body.sort;
+      sort = parseInt(req.body.sort);
+      console.log(sort);
     }
     let { from, dropOff, weight, services } = req.body;
     let query = {};
@@ -403,6 +405,8 @@ module.exports.fetchFilteredCompanies = async (req, res) => {
 
     // query.$match = { size: "medium" };
     console.log(query);
+
+    query.status = "ACTIVE";
 
     let pipeline = [
       {
@@ -540,7 +544,7 @@ module.exports.calculatePrices = async (req, res) => {
       totalPrice: 0,
     };
     const fee = await model.AdminFee.findOne();
-    const price = req.body.price;
+    const price = parseInt(req.body.price);
     response.adminFee = (fee.fee / 100) * price;
     response.vendorFee = price;
     response.totalPrice = price + response.adminFee;

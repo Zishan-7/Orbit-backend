@@ -2,6 +2,15 @@ const model = require("../Models");
 const jwt = require("jsonwebtoken");
 const moment = require("moment");
 
+const { Storage } = require("@google-cloud/storage");
+
+const storage = new Storage({
+  projectId: "orbit-ad1bb",
+  keyFilename: "./serviceKey.json",
+});
+
+const bucket = storage.bucket("gs://orbit-ad1bb.appspot.com");
+
 module.exports.register = async (req, res) => {
   try {
     // Get user input
@@ -621,6 +630,7 @@ module.exports.editMasterListing = async (req, res) => {
       msg: "Listing updated",
     });
   } catch (e) {
+    console.log(e);
     return res.status(200).send({
       statusCode: 400,
       msg: "Some Error occured",
@@ -696,6 +706,9 @@ module.exports.placeOrder = async (req, res) => {
   try {
     const fee = await model.AdminFee.findOne();
     const body = req.body;
+    body.totalPrice = parseFloat(body.totalPrice);
+    body.adminFee = parseFloat(body.adminFee);
+    body.vendorPrice = parseFloat(body.vendorPrice);
     body.adminFee = (fee.fee / 100) * body.totalPrice;
     body.vendorPrice = body.totalPrice;
     body.totalPrice = body.totalPrice + body.adminFee;
@@ -710,6 +723,13 @@ module.exports.placeOrder = async (req, res) => {
     };
 
     const createdChat = await model.Chat.create(chatData);
+
+    if (req.body.listingId) {
+      console.log("hello" + req.body.listingId);
+      await model.Listing.findOneAndUpdate(req.body.listingId, {
+        status: "PROCESSING",
+      });
+    }
 
     return res.status(201).json({
       statusCode: 201,
@@ -1199,6 +1219,41 @@ module.exports.getNotifications = async (req, res) => {
   } catch (e) {
     console.log(e);
     return res.status(200).send({
+      statusCode: 400,
+      msg: "Some Error occured",
+    });
+  }
+};
+
+module.exports.uploadFile = async (req, res) => {
+  try {
+    const blob = bucket.file(req.file.originalname);
+
+    const blobWriter = blob.createWriteStream({
+      metadata: {
+        contentType: req.file.mimetype,
+      },
+    });
+
+    blobWriter.on("error", (err) => console.log(err));
+
+    blobWriter.on("finish", () => {
+      // Assembling public URL for accessing the file via HTTP
+      const publicUrl = `https://firebasestorage.googleapis.com/v0/b/${
+        bucket.name
+      }/o/${encodeURI(blob.name)}?alt=media`;
+
+      // Return the file name and its public URL
+      res.status(200).send({
+        statusCode: 200,
+        msg: "File Uploaded",
+        url: publicUrl,
+      });
+    });
+
+    blobWriter.end(req.file.buffer);
+  } catch {
+    return res.status(400).send({
       statusCode: 400,
       msg: "Some Error occured",
     });

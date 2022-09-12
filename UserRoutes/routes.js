@@ -1,6 +1,9 @@
 const router = require("express").Router();
 const controller = require("../Controller");
 const auth = require("../Middleware/userAuth");
+const multer = require("multer");
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 router.post("/login", controller.User.login);
 router.post("/register", controller.User.register);
@@ -36,5 +39,9 @@ router.get("/promoCode/:id", auth, controller.User.getSinglePromoCode);
 // calculate price
 
 router.post("/calculatePrice", auth, controller.User.calculatePrices);
+
+//file Upload
+
+router.post("/uploadFile", upload.single("file"), controller.Admin.uploadFile);
 
 module.exports = router;
