@@ -13,6 +13,7 @@ const userSchema = new Schema(
     profilePic: { type: String, default: "" },
     token: { type: String, default: "" },
     isDeleted: { type: Boolean, default: false },
+    pushToken: { type: String, default: "" },
   },
   { timestamps: true }
 );

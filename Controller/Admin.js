@@ -1,6 +1,7 @@
 const model = require("../Models");
 const jwt = require("jsonwebtoken");
 const moment = require("moment");
+const services = require("../services");
 
 const { Storage } = require("@google-cloud/storage");
 
@@ -1187,13 +1188,25 @@ module.exports.admins = async (req, res) => {
 
 module.exports.sendNotification = async (req, res) => {
   try {
-    const vendor = await model.Notification.create(req.body);
+    const { message } = req.body;
+
+    let users = await model.User.find({
+      pushToken: { $ne: "" },
+    });
+    await services.PushNotification.sendToUsers({
+      users,
+      title: "ALERT!",
+      message: message,
+      data: { title: "ALERT", message: message },
+    });
+    const notification = await model.Notification.create(req.body);
     return res.status(201).json({
       statusCode: 201,
       msg: "Notifcation sent",
-      data: vendor,
+      data: notification,
     });
   } catch (e) {
+    console.log(e);
     return res.status(200).send({
       statusCode: 400,
       msg: "Some Error occured",

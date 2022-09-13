@@ -537,6 +537,10 @@ module.exports.getSinglePromoCode = async (req, res) => {
 };
 
 module.exports.calculatePrices = async (req, res) => {
+  const formatter = new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
   try {
     const response = {
       adminFee: 0,
@@ -545,10 +549,12 @@ module.exports.calculatePrices = async (req, res) => {
     };
     const fee = await model.AdminFee.findOne();
     const price = parseInt(req.body.price);
-    response.adminFee = (fee.fee / 100) * price;
-    response.vendorFee = price;
-    response.totalPrice = price + response.adminFee;
-
+    response.adminFee = parseFloat(formatter.format((fee.fee / 100) * price));
+    response.vendorFee = parseFloat(formatter.format(price));
+    response.totalPrice = parseFloat(
+      formatter.format(price + response.adminFee)
+    );
+    console.log(response);
     return res.status(200).json({
       statusCode: 200,
       msg: "Calculation Successful",
