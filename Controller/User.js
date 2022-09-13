@@ -336,6 +336,7 @@ module.exports.getLogisticCompanies = async (req, res) => {
       query.$or = [
         {
           logisticCompany: _$search,
+          pickUpPoint: _$search,
         },
       ];
     }

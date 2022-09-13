@@ -13,7 +13,7 @@ module.exports.sendToUsers = async ({ users, title, message, data = {} }) => {
     // console.log(users);
 
     const filterUser = users.filter((user) => user.pushToken);
-    console.log(filterUser);
+    // console.log(filterUser);
 
     if (filterUser.length) {
       const tokens = filterUser.map((user) => user.pushToken);

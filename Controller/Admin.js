@@ -729,9 +729,15 @@ module.exports.placeOrder = async (req, res) => {
 
     if (req.body.listingId) {
       console.log("hello" + req.body.listingId);
-      await model.Listing.findByIdAndUpdate(req.body.listingId, {
-        status: "PROCESSING",
-      });
+      const updateListing = await model.Listing.findById(req.body.listingId);
+
+      updateListing.currentBookings += 1;
+      if (updateListing.currentBookings >= updateListing.maxBookings) {
+        updateListing.status = "INACTIVE";
+      }
+      // await model.Listing.findByIdAndUpdate(req.body.listingId, {
+      //   status: "PROCESSING",
+      // });
     }
 
     return res.status(201).json({

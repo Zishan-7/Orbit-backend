@@ -16,6 +16,8 @@ const listingSchema = new Schema(
     endDate: { type: Date, required: true },
     status: { type: String, required: true, default: "" },
     price: { type: Number, required: true, default: "" },
+    maxBookings: { type: Number, default: 10 },
+    currentBookings: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
