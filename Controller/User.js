@@ -62,7 +62,7 @@ module.exports.register = async (req, res) => {
 module.exports.login = async (req, res) => {
   try {
     // Get user input
-    const { email, password } = req.body;
+    const { email, password, pushToken } = req.body;
 
     // Validate user input
     if (!(email && password)) {
@@ -84,6 +84,9 @@ module.exports.login = async (req, res) => {
 
       // save user token
       User.token = token;
+      if (pushToken) {
+        User.pushToken = pushToken;
+      }
       User.save();
 
       // user
