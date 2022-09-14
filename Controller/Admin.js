@@ -735,6 +735,8 @@ module.exports.placeOrder = async (req, res) => {
       if (updateListing.currentBookings >= updateListing.maxBookings) {
         updateListing.status = "INACTIVE";
       }
+
+      await updateListing.save();
       // await model.Listing.findByIdAndUpdate(req.body.listingId, {
       //   status: "PROCESSING",
       // });
