@@ -44,4 +44,12 @@ router.post("/calculatePrice", auth, controller.User.calculatePrices);
 
 router.post("/uploadFile", upload.single("file"), controller.Admin.uploadFile);
 
+//orders
+
+router.get("/orders/:id", auth, controller.User.getOrder);
+
+// notifications
+
+router.get("/notifications", auth, controller.User.getNotifications);
+
 module.exports = router;

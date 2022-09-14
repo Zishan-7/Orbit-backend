@@ -336,6 +336,8 @@ module.exports.getLogisticCompanies = async (req, res) => {
       query.$or = [
         {
           logisticCompany: _$search,
+        },
+        {
           pickUpPoint: _$search,
         },
       ];
@@ -563,6 +565,41 @@ module.exports.calculatePrices = async (req, res) => {
       statusCode: 200,
       msg: "Calculation Successful",
       data: response,
+    });
+  } catch (e) {
+    console.log(e);
+    return res.status(200).send({
+      statusCode: 400,
+      msg: "Some Error occured",
+    });
+  }
+};
+
+module.exports.getOrder = async (req, res) => {
+  try {
+    const listing = await model.Order.findById(req.params.id);
+    return res.status(200).json({
+      statusCode: 200,
+      msg: "Orders fetched",
+      data: listing,
+    });
+  } catch (e) {
+    return res.status(200).send({
+      statusCode: 400,
+      msg: "Some Error occured",
+    });
+  }
+};
+
+module.exports.getNotifications = async (req, res) => {
+  try {
+    const notifications = await model.Notification.find().sort({
+      createdAt: -1,
+    });
+    return res.status(201).json({
+      statusCode: 200,
+      msg: "Notifications fetched",
+      data: notifications,
     });
   } catch (e) {
     console.log(e);
