@@ -406,7 +406,7 @@ module.exports.fetchFilteredCompanies = async (req, res) => {
     //services is array
 
     query.maxWeight = {
-      $gt: parseInt(weight),
+      $gt: parseInt(weight) + 1,
     };
 
     // query.$match = { size: "medium" };
@@ -593,7 +593,9 @@ module.exports.getOrder = async (req, res) => {
 
 module.exports.getNotifications = async (req, res) => {
   try {
-    const notifications = await model.Notification.find().sort({
+    const notifications = await model.Notification.find({
+      $or: [{ userId: "all" }, { userId: req.user.user_id }],
+    }).sort({
       createdAt: -1,
     });
     return res.status(201).json({

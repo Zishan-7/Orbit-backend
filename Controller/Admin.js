@@ -810,6 +810,24 @@ module.exports.changeOrderStatus = async (req, res) => {
     const order = await model.Order.findById(req.params.id);
     order.status = req.body.status;
     await order.save();
+
+    let users = await model.User.find({
+      _id: order.userId,
+      pushToken: { $ne: "" },
+    });
+
+    const message = `Order no. ${order._id} is ${req.body.status}`;
+    await services.PushNotification.sendToUsers({
+      users,
+      title: "Order Update!",
+      message: message,
+      data: { title: "ALERT", message: message },
+    });
+    await model.Notification.create({
+      userId: order.userId,
+      message,
+    });
+
     return res.status(201).json({
       statusCode: 200,
       msg: "Order Status updated",
@@ -1079,6 +1097,28 @@ module.exports.sendMessage = async (req, res) => {
 
     await model.Chat.findByIdAndUpdate(req.body.chatId, {
       latestMessage: message,
+    });
+
+    let userToSendNotification = "";
+
+    message.chat.users.forEach((user) => {
+      if (user._id != req.user.user_id) {
+        console.log(user._id.toString());
+        userToSendNotification = user._id.toString();
+      }
+    });
+
+    console.log(message.content);
+
+    let users = await model.User.find({
+      _id: userToSendNotification,
+      pushToken: { $ne: "" },
+    });
+    await services.PushNotification.sendToUsers({
+      users,
+      title: "New message from Admin",
+      message: message.content.toString(),
+      data: { title: "ALERT", message: message.content.toString() },
     });
 
     res.json(message);

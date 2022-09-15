@@ -1,6 +1,9 @@
 const router = require("express").Router();
 const controller = require("../Controller");
 const auth = require("../Middleware/userAuth");
+const multer = require("multer");
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 router.post("/login", controller.Admin.login);
 router.post("/register", controller.Admin.register);
@@ -77,5 +80,9 @@ router.get("/admins", auth, controller.Admin.admins);
 
 router.post("/notification", auth, controller.Admin.sendNotification);
 router.post("/getNotification", auth, controller.Admin.getNotifications);
+
+//file Upload
+
+router.post("/uploadFile", upload.single("file"), controller.Admin.uploadFile);
 
 module.exports = router;
