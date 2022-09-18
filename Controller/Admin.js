@@ -236,7 +236,25 @@ module.exports.addVendor = async (req, res) => {
 
 module.exports.getVendors = async (req, res) => {
   try {
-    const vendors = await model.Vendor.find();
+    let query = {};
+    if (req.body.search) {
+      const _$search = { $regex: req.body.search, $options: "i" };
+      query.$or = [
+        {
+          companyName: _$search,
+        },
+      ];
+    }
+
+    console.log(query);
+
+    let pipeline = [
+      {
+        $match: query,
+      },
+    ];
+
+    const vendors = await model.Vendor.aggregate(pipeline);
     return res.status(201).json({
       statusCode: 200,
       msg: "Vendor fetched",
@@ -919,6 +937,7 @@ module.exports.getClientSales = async (req, res) => {
     let query = {
       status: { $in: ["ACCEPTED"] },
     };
+
     if (req.body.search) {
       console.log(req.body.search);
       const _$search = { $regex: req.body.search, $options: "i" };
@@ -931,6 +950,18 @@ module.exports.getClientSales = async (req, res) => {
     if (req.body.paymentStatus && req.body.paymentStatus[0]) {
       query.paymentStatus = { $in: req.body.paymentStatus };
     }
+
+    if (req.body.date) {
+      const date1 = moment(req.body.date);
+      const Startmonth = new Date(date1.startOf("month"));
+      const Endmonth = new Date(date1.endOf("month"));
+
+      query.createdAt = {
+        $gt: Startmonth,
+        $lt: Endmonth,
+      };
+    }
+
     console.log(query);
 
     let pipeline = [
@@ -938,6 +969,7 @@ module.exports.getClientSales = async (req, res) => {
         $match: query,
       },
     ];
+
     const listing = await model.Order.aggregate(pipeline);
     return res.status(201).json({
       statusCode: 200,
@@ -970,6 +1002,18 @@ module.exports.getVendorSales = async (req, res) => {
     if (req.body.paymentStatus && req.body.paymentStatus[0]) {
       query.paymentStatus = { $in: req.body.paymentStatus };
     }
+
+    if (req.body.date) {
+      const date1 = moment(req.body.date);
+      const Startmonth = new Date(date1.startOf("month"));
+      const Endmonth = new Date(date1.endOf("month"));
+
+      query.createdAt = {
+        $gt: Startmonth,
+        $lt: Endmonth,
+      };
+    }
+
     console.log(query);
 
     let pipeline = [

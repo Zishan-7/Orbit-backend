@@ -7,6 +7,7 @@ const vendorSchema = new Schema(
     servicesProvided: [],
     email: { type: String, required: true },
     personInCharge: { type: String, default: "" },
+    profilePic: { type: String, default: "" },
   },
   { timestamps: true }
 );

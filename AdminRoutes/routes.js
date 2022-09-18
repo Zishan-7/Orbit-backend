@@ -14,7 +14,7 @@ router.post("/changePass", auth, controller.Admin.changePassword);
 
 //vendors
 
-router.get("/vendors", auth, controller.Admin.getVendors);
+router.post("/vendors", auth, controller.Admin.getVendors);
 router.post("/vendors", auth, controller.Admin.addVendor);
 router.put("/vendors/:id", auth, controller.Admin.editVendor);
 router.delete("/vendors", auth, controller.Admin.deleteVendor);
