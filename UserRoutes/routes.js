@@ -11,6 +11,7 @@ router.post("/logout", auth, controller.User.logout);
 router.get("/getProfile", auth, controller.User.getProfile);
 router.put("/editProfile", auth, controller.User.editProfile);
 router.post("/changePass", auth, controller.User.changePassword);
+router.post("/resetPassword", controller.User.resetPassword);
 
 //companies
 

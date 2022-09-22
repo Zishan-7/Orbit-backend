@@ -1362,7 +1362,8 @@ module.exports.uploadFile = async (req, res) => {
     });
 
     blobWriter.end(req.file.buffer);
-  } catch {
+  } catch (e) {
+    console.log(e);
     return res.status(400).send({
       statusCode: 400,
       msg: "Some Error occured",

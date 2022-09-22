@@ -611,3 +611,30 @@ module.exports.getNotifications = async (req, res) => {
     });
   }
 };
+
+module.exports.resetPassword = async (req, res) => {
+  try {
+    const email = req.body.email;
+
+    const user = await model.User.findOne({ email });
+
+    if (user) {
+      user.password = "1234";
+      await user.save();
+      res.status(200).json({
+        statusCode: 20,
+        msg: "Password Updated",
+      });
+    } else {
+      res.status(200).send({
+        statusCode: 304,
+        msg: "User does not exist",
+      });
+    }
+  } catch (e) {
+    return res.status(200).send({
+      statusCode: 304,
+      msg: "Some error occured, Please try again",
+    });
+  }
+};
