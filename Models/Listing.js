@@ -5,6 +5,11 @@ const listingSchema = new Schema(
   {
     vendorId: { type: String, required: true, default: "" },
     logisticCompany: { type: String, required: true, default: "" },
+    picture: {
+      type: String,
+      default:
+        "https://firebasestorage.googleapis.com/v0/b/orbit-ad1bb.appspot.com/o/pp.png?alt=media",
+    },
     vehicle: { type: String, required: true, default: "" },
     brand: { type: String, required: true, default: "" },
     serviceProvided: [{ type: String }],

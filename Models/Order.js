@@ -8,6 +8,11 @@ const orderSchema = new Schema(
     vendorId: { type: String, required: true, default: "" },
     pickUpPoint: { type: String, required: true, default: "" },
     dropOffState: [{ type: String }],
+    picture: {
+      type: String,
+      default:
+        "https://firebasestorage.googleapis.com/v0/b/orbit-ad1bb.appspot.com/o/pp.png?alt=media",
+    },
     // amtDropOffPoints: { type: Number, required: true, default: 1 },
     itemType: { type: String, required: true, default: "" },
     cargoWeight: { type: Number, required: true, default: "" },

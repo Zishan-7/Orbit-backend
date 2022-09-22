@@ -580,7 +580,12 @@ module.exports.deleteUser = async (req, res) => {
 
 module.exports.addMasterListing = async (req, res) => {
   try {
+    const vendor = await model.Vendor.findById(req.body.vendorId);
+
+    req.body.picture = vendor.profilePic;
+
     const listing = await model.Listing.create(req.body);
+
     return res.status(201).json({
       statusCode: 201,
       msg: "Lising Created",
@@ -735,6 +740,11 @@ module.exports.placeOrder = async (req, res) => {
     body.adminFee = (fee.fee / 100) * body.totalPrice;
     body.vendorPrice = body.totalPrice;
     body.totalPrice = body.totalPrice + body.adminFee;
+
+    const vendor = await model.Vendor.findById(req.body.vendorId);
+
+    req.body.picture = vendor.profilePic;
+
     const listing = await model.Order.create(req.body);
 
     const admin = await model.User.findOne({ isAdmin: true });

@@ -7,7 +7,11 @@ const vendorSchema = new Schema(
     servicesProvided: [],
     email: { type: String, required: true },
     personInCharge: { type: String, default: "" },
-    profilePic: { type: String, default: "" },
+    profilePic: {
+      type: String,
+      default:
+        "https://firebasestorage.googleapis.com/v0/b/orbit-ad1bb.appspot.com/o/pp.png?alt=media",
+    },
   },
   { timestamps: true }
 );
