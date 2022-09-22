@@ -175,18 +175,19 @@ module.exports.changePassword = async (req, res) => {
   try {
     const id = req.user.user_id;
 
-    const user = await model.Admin.findById(id);
+    const user = await model.User.findById(id);
+    console.log(user);
     const old = user.password;
 
     const isCorrect = req.body.oldPassword == old;
 
     if (isCorrect == false) {
       res.status(200).send({
-        statusCode: 304,
+        statusCode: 302,
         msg: "Incorrect Current Password",
       });
     } else {
-      user.password = req.body.oldPassword;
+      user.password = req.body.newPassword;
       await user.save();
       res.status(201).json({
         statusCode: 201,
@@ -195,6 +196,7 @@ module.exports.changePassword = async (req, res) => {
       });
     }
   } catch (e) {
+    console.log(e);
     return res.status(200).send({
       statusCode: 304,
       msg: "Some error occured, Please try again",
