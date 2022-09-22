@@ -173,7 +173,7 @@ module.exports.editProfile = async (req, res) => {
 
 module.exports.changePassword = async (req, res) => {
   try {
-    const id = req.admin.id;
+    const id = req.user.user_id;
 
     const user = await model.Admin.findById(id);
     const old = user.password;
@@ -764,6 +764,7 @@ module.exports.placeOrder = async (req, res) => {
       statusCode: 201,
       msg: "Order Placed",
       data: listing,
+      chat: createdChat,
     });
   } catch (e) {
     console.log(e);
