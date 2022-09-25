@@ -11,6 +11,7 @@ router.post("/logout", auth, controller.Admin.logout);
 router.get("/getProfile", auth, controller.Admin.getProfile);
 router.put("/editProfile", auth, controller.Admin.editProfile);
 router.post("/changePass", auth, controller.Admin.changePassword);
+router.post("/resetPassword", controller.Admin.resetPassword);
 
 //vendors
 

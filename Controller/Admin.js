@@ -39,7 +39,7 @@ module.exports.register = async (req, res) => {
         userName: "Admin",
         state: " ",
         companyAddress: " ",
-        profilePic: " ",
+        profilePic: "https://firebasestorage.googleapis.com/v0/b/orbit-ad1bb.appspot.com/o/blank-profile-picture-ge13eef4ee_1280.png?alt=media",
         isAdmin: true,
       });
 
@@ -1377,6 +1377,34 @@ module.exports.uploadFile = async (req, res) => {
     return res.status(400).send({
       statusCode: 400,
       msg: "Some Error occured",
+    });
+  }
+};
+
+
+module.exports.resetPassword = async (req, res) => {
+  try {
+    const email = req.body.email;
+
+    const user = await model.User.findOne({ email, isAdmin:true });
+
+    if (user) {
+      user.password = "1234";
+      await user.save();
+      res.status(200).json({
+        statusCode: 20,
+        msg: "Password Updated",
+      });
+    } else {
+      res.status(200).send({
+        statusCode: 304,
+        msg: "User does not exist",
+      });
+    }
+  } catch (e) {
+    return res.status(200).send({
+      statusCode: 304,
+      msg: "Some error occured, Please try again",
     });
   }
 };
