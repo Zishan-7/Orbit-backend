@@ -387,7 +387,7 @@ module.exports.fetchFilteredCompanies = async (req, res) => {
       sort = parseInt(req.body.sort);
       console.log(sort);
     }
-    let { from, dropOff, weight, services } = req.body;
+    let { from, dropOff, weight, services, maxDropOffPoints } = req.body;
     let query = {};
 
     const _$search = { $regex: from, $options: "i" };
@@ -406,9 +406,12 @@ module.exports.fetchFilteredCompanies = async (req, res) => {
     //services is array
 
     query.maxWeight = {
-      $gt: parseInt(weight) + 1,
+      $gt: parseInt(weight) - 1,
     };
 
+    query.maxDropOffPoints = {
+      $gt: parseInt(maxDropOffPoints) - 1,
+    };
     // query.$match = { size: "medium" };
     console.log(query);
 

@@ -39,7 +39,8 @@ module.exports.register = async (req, res) => {
         userName: "Admin",
         state: " ",
         companyAddress: " ",
-        profilePic: "https://firebasestorage.googleapis.com/v0/b/orbit-ad1bb.appspot.com/o/blank-profile-picture-ge13eef4ee_1280.png?alt=media",
+        profilePic:
+          "https://firebasestorage.googleapis.com/v0/b/orbit-ad1bb.appspot.com/o/blank-profile-picture-ge13eef4ee_1280.png?alt=media",
         isAdmin: true,
       });
 
@@ -741,6 +742,15 @@ module.exports.placeOrder = async (req, res) => {
     body.vendorPrice = body.totalPrice;
     body.totalPrice = body.totalPrice + body.adminFee;
 
+    if (body.promoCode != "") {
+      if (body.promoCodeType == "RM") {
+        body.totalPrice = body.totalPrice - parseFloat(body.promoCodeValue);
+      } else {
+        let discount = (body.totalPrice * body.promoCodeValue) / 100;
+        body.totalPrice = body.totalPrice - parseFloat(discount);
+      }
+    }
+
     const vendor = await model.Vendor.findById(req.body.vendorId);
 
     req.body.picture = vendor.profilePic;
@@ -948,7 +958,8 @@ module.exports.getUsersOrders = async (req, res) => {
 module.exports.getClientSales = async (req, res) => {
   try {
     let query = {
-      status: { $in: ["ACCEPTED"] },
+      status: { $in: ["COMPLETED", "CANCELLED"] },
+      // ["ACCEPTED"]
     };
 
     if (req.body.search) {
@@ -1001,7 +1012,8 @@ module.exports.getClientSales = async (req, res) => {
 module.exports.getVendorSales = async (req, res) => {
   try {
     let query = {
-      status: { $in: ["COMPLETED"] },
+      status: { $in: ["COMPLETED", "CANCELLED"] },
+      // ["COMPLETED"]
     };
     if (req.body.search) {
       const _$search = { $regex: req.body.search, $options: "i" };
@@ -1381,12 +1393,11 @@ module.exports.uploadFile = async (req, res) => {
   }
 };
 
-
 module.exports.resetPassword = async (req, res) => {
   try {
     const email = req.body.email;
 
-    const user = await model.User.findOne({ email, isAdmin:true });
+    const user = await model.User.findOne({ email, isAdmin: true });
 
     if (user) {
       user.password = "1234";
