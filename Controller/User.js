@@ -463,7 +463,19 @@ module.exports.getProcessingBookings = async (req, res) => {
 module.exports.getAcceptedBookings = async (req, res) => {
   try {
     const userId = req.user.user_id;
-    const listing = await model.Order.find({ userId, status: "ACCEPTED" });
+    let query = {
+      userId: userId,
+    };
+    query.status = { $in: ["ACCEPTED", "IN-TRANSIT"] };
+
+    let pipeline = [
+      {
+        $match: query,
+      },
+    ];
+
+    const listing = await model.Order.aggregate(pipeline);
+    // const listing = await model.Order.find({ userId, status: "ACCEPTED" });
     return res.status(201).json({
       statusCode: 200,
       msg: "Orders fetched",
