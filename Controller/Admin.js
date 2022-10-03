@@ -972,7 +972,7 @@ module.exports.getClientSales = async (req, res) => {
       ];
     }
     if (req.body.paymentStatus && req.body.paymentStatus[0]) {
-      query.paymentStatus = { $in: req.body.paymentStatus };
+      query.userPaymentStatus = { $in: req.body.paymentStatus };
     }
 
     if (req.body.date) {
@@ -1025,7 +1025,8 @@ module.exports.getVendorSales = async (req, res) => {
     }
 
     if (req.body.paymentStatus && req.body.paymentStatus[0]) {
-      query.paymentStatus = { $in: req.body.paymentStatus };
+      query.clientPaymentStatus = req.body.paymentStatus[0];
+      // { $in: req.body.paymentStatus };
     }
 
     if (req.body.date) {
@@ -1258,8 +1259,15 @@ module.exports.dashboard = async (req, res) => {
     });
 
     const totalPendingVendorOrderPayment = await model.Order.countDocuments({
-      paymentStatus: "PENDING",
+      $or: [{ status: "COMPLETED" }, { status: "CANCELLED" }],
+      clientPaymentStatus: "PENDING",
     });
+
+    const totalPendingClientOrderPayment = await model.Order.countDocuments({
+      $or: [{ status: "COMPLETED" }, { status: "CANCELLED" }],
+      userPaymentStatus: "PENDING",
+    });
+    // "COMPLETED", "CANCELLED"
 
     const totalVendors = await model.Vendor.countDocuments();
 
@@ -1274,6 +1282,7 @@ module.exports.dashboard = async (req, res) => {
         totalVendors,
         totalPendingVendorOrderPayment,
         totalOnGoing,
+        totalPendingClientOrderPayment,
       },
     });
   } catch (e) {
@@ -1376,6 +1385,7 @@ module.exports.uploadFile = async (req, res) => {
       }/o/${encodeURI(blob.name)}?alt=media`;
 
       // Return the file name and its public URL
+
       res.status(200).send({
         statusCode: 200,
         msg: "File Uploaded",

@@ -509,7 +509,10 @@ module.exports.getCompletedBookings = async (req, res) => {
 module.exports.getCancelledBookings = async (req, res) => {
   try {
     const userId = req.user.user_id;
-    const listing = await model.Order.find({ userId, status: "CANCELLED" });
+    const listing = await model.Order.find({
+      userId,
+      $or: [{ status: "CANCELLED" }, { status: "REJECTED" }],
+    });
     return res.status(201).json({
       statusCode: 200,
       msg: "Orders fetched",
