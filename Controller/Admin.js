@@ -1255,7 +1255,7 @@ module.exports.dashboard = async (req, res) => {
     });
 
     const totalOnGoing = await model.Order.countDocuments({
-      status: "ACTIVE",
+      status: "IN-TRANSIT",
     });
 
     const totalPendingVendorOrderPayment = await model.Order.countDocuments({

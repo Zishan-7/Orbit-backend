@@ -13,8 +13,8 @@ const userSchema = new Schema(
     profilePic: {
       type: String,
       default:
-       "https://firebasestorage.googleapis.com/v0/b/orbit-ad1bb.appspot.com/o/image%20(16).png?alt=media",
-        // "https://firebasestorage.googleapis.com/v0/b/orbit-ad1bb.appspot.com/o/blank-profile-picture-ge13eef4ee_1280.png?alt=media",
+        "https://firebasestorage.googleapis.com/v0/b/orbit-ad1bb.appspot.com/o/DefaultProfilePic.png?alt=media",
+      // "https://firebasestorage.googleapis.com/v0/b/orbit-ad1bb.appspot.com/o/blank-profile-picture-ge13eef4ee_1280.png?alt=media",
     },
     token: { type: String, default: "" },
     isDeleted: { type: Boolean, default: false },
