@@ -1011,6 +1011,7 @@ module.exports.getClientSales = async (req, res) => {
 
 module.exports.getVendorSales = async (req, res) => {
   try {
+    console.log(req.body.search);
     let query = {
       status: { $in: ["COMPLETED", "CANCELLED"] },
       // ["COMPLETED"]
@@ -1019,7 +1020,7 @@ module.exports.getVendorSales = async (req, res) => {
       const _$search = { $regex: req.body.search, $options: "i" };
       query.$or = [
         {
-          userName: _$search,
+          logisticCompany: _$search,
         },
       ];
     }
